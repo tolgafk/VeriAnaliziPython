@@ -1,0 +1,358 @@
+import json
+import networkx as nx
+import matplotlib.pyplot as plt
+
+class Dugum:
+    def __init__(self, veri):
+        self.veri = veri
+        self.sonraki = None
+
+class Liste:
+    def __init__(self):
+        self.__baslangic = None
+        self.__son = None
+        self.boyut = 0
+
+    def __bos_mu(self):
+        return self.__baslangic is None
+
+    def ekle(self, veri):
+        self.boyut += 1
+        yeni_dugum = Dugum(veri)
+        if self.__bos_mu():
+            self.__baslangic = yeni_dugum
+            self.__son = yeni_dugum
+            return
+        self.__son.sonraki = yeni_dugum
+        self.__son = yeni_dugum
+
+    def sil(self, veri):
+        mevcut = self.__baslangic
+        onceki = None
+        while mevcut:
+            if mevcut.veri == veri:
+                if onceki:
+                    onceki.sonraki = mevcut.sonraki
+                else:
+                    self.__baslangic = mevcut.sonraki
+                print(f"{veri} listeden silindi.")
+                return
+            onceki = mevcut
+            mevcut = mevcut.sonraki
+
+        print(f"{veri} listede bulunamadı.")
+    
+    def get(self, indeks):
+        anlik = self.__baslangic
+        for i in range(indeks):
+            anlik = anlik.sonraki
+        return anlik
+
+class Kullanicilar:
+    def __init__(self, name, surname, username, followerNumber, followNumber, country, language, followers, follows, tweets):
+        self.name = name
+        self.surname = surname
+        self.username = username
+        self. followerNumber = followerNumber
+        self. followNumber = followNumber
+        self.country = country
+        self.language = language
+        self.followers = Liste()
+        self.follows = Liste()
+        self.tweets = Liste()
+        for follower in followers:
+            self.followers.ekle(follower)
+        for follow in follows:
+            self.follows.ekle(follow)
+        for tweet in tweets:
+            self.tweets.ekle(tweet)
+
+class Graph:
+    def __init__(self):
+        self.__graph = nx.Graph()
+
+    def add_edge(self, person1, person2):
+        self.__graph.add_edge(person1, person2)
+
+    def visualize_graph(self):
+        plt.figure(figsize=(5, 5))
+        pos = nx.spring_layout(self.__graph)
+        nx.draw(self.__graph, pos, with_labels=True, font_weight='bold', node_size=50, node_color='blue', edge_color='gray', linewidths=0.2)
+        plt.show()
+
+
+def gorsellestir(kisi, graph):
+    
+    for i in range(kisi.followers.boyut):
+        follower = kisi.followers.get(i).veri
+        graph.add_edge(kisi.username, follower)
+
+class HashTable:
+    def __init__(self, boyut):
+        self.boyut = boyut
+        self.__anahtarlar = Liste()
+        for i in range(boyut):
+            self.__anahtarlar.ekle(Liste())
+        self.__veriler = Liste()
+        for j in range(boyut):
+            self.__veriler.ekle(Liste())
+
+
+    def __hash_bul(self, anahtar):
+        return anahtar % self.boyut
+
+    def ekle(self, anahtar, deger):
+        indeks = self.__hash_bul(anahtar)
+        self.__veriler.get(indeks).veri.ekle(deger)
+        self.__anahtarlar.get(indeks).veri.ekle(anahtar)
+    
+    def txt_aktar(self, folder_name):
+        with open(folder_name, "w") as dosya:
+            for i in range(self.boyut):
+                dosya.write(f"\n\n{i}. Index: \n\n")
+                for j in range(self.__anahtarlar.get(i).veri.boyut):
+                    dosya.write(f"({self.__anahtarlar.get(i).veri.get(j).veri}, {self.__veriler.get(i).veri.get(j).veri})")
+            print(i)
+        dosya.close()
+        print("Dosyaya yazıldı...")
+
+kullanici_listesi = Liste()
+with open("people_data.json", "r") as file:
+    people_data = json.load(file)
+
+for person in people_data:
+    kisi = Kullanicilar(person["name"], person["surname"], person["username"], person["followerNumber"], person["followNumber"], person["country"], person["language"], person["followers"], person["follows"], person["tweets"])
+    kullanici_listesi.ekle(kisi)
+
+tech_table = HashTable(100)
+travel_table = HashTable(100)
+food_table = HashTable(100)
+books_table = HashTable(100)
+fitness_table = HashTable(100)
+music_table = HashTable(100)
+movies_table = HashTable(100)
+photography_table = HashTable(100)
+fashion_table = HashTable(100)
+gaming_table = HashTable(100)
+science_table = HashTable(100)
+art_table = HashTable(100)
+coding_table = HashTable(100)
+history_table = HashTable(100)
+architecture_table = HashTable(100)
+health_table = HashTable(100)
+finance_table = HashTable(100)
+design_table = HashTable(100)
+celebrities_table = HashTable(100)
+education_table = HashTable(100)
+politics_table = HashTable(100)
+environment_table = HashTable(100)
+sports_table = HashTable(100)
+business_table = HashTable(100)
+culture_table = HashTable(100)
+entertainment_table = HashTable(100)
+startups_table = HashTable(100)
+cooking_table = HashTable(100)
+world_table = HashTable(100)
+space_table = HashTable(100)
+nature_table = HashTable(100)
+home_decoration_table = HashTable(100)
+mental_health_table = HashTable(100)
+productivity_table = HashTable(100)
+social_media_table = HashTable(100)
+parenting_table = HashTable(100)
+career_table = HashTable(100)
+virtual_reality_table = HashTable(100)
+cryptocurrency_table = HashTable(100)
+cars_table = HashTable(100)
+anime_table = HashTable(100)
+comic_books_table = HashTable(100)
+camping_table = HashTable(100)
+
+for i in range(kullanici_listesi.boyut):
+    for j in range(30):
+        if "technology" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            tech_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "travel" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            travel_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "food" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            food_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "books" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            books_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "fitness" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            fitness_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "music" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            music_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "movies" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            movies_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "photography" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            photography_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "fashion" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            fashion_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "gaming" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            gaming_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "science" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            science_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "art" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            art_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "coding" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            coding_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "history" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            history_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "architecture" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            architecture_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "health" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            health_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "finance" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            finance_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "design" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            design_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "celebrities" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            celebrities_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "education" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            education_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "politics" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            politics_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "environment" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            environment_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "sports" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            sports_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "business" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            business_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "culture" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            culture_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "entertainment" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            entertainment_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "startups" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            startups_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "cooking" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            cooking_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "world" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            world_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "space" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            space_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "nature" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            nature_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "home decoration" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            home_decoration_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "mental health" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            mental_health_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "productivity" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            productivity_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "social media" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            social_media_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "parenting" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            parenting_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "career" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            career_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "virtual reality" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            virtual_reality_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "cryptocurrency" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            cryptocurrency_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "cars" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            cars_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "anime" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            anime_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "comic books" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            comic_books_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+        if "camping" in kullanici_listesi.get(i).veri.tweets.get(j).veri:
+            camping_table.ekle(i, kullanici_listesi.get(i).veri.username)
+            break
+
+    print(i)
+    if i == 1:
+        break
+
+tech_table.txt_aktar("tech_table.txt")
+travel_table.txt_aktar("travel_table.txt")
+food_table.txt_aktar("food_table.txt")
+books_table.txt_aktar("books_table.txt")
+fitness_table.txt_aktar("fitness_table.txt")
+music_table.txt_aktar("music_table.txt")
+movies_table.txt_aktar("movies_table.txt")
+photography_table.txt_aktar("photography_table.txt")
+fashion_table.txt_aktar("fashion_table.txt")
+gaming_table.txt_aktar("gaming_table.txt")
+science_table.txt_aktar("science_table.txt")
+art_table.txt_aktar("art_table.txt")
+coding_table.txt_aktar("coding_table.txt")
+history_table.txt_aktar("history_table.txt")
+architecture_table.txt_aktar("architecture_table.txt")
+health_table.txt_aktar("health_table.txt")
+finance_table.txt_aktar("finance_table.txt")
+design_table.txt_aktar("design_table.txt")
+celebrities_table.txt_aktar("celebrities_table.txt")
+education_table.txt_aktar("education_table.txt")
+politics_table.txt_aktar("politics_table.txt")
+environment_table.txt_aktar("environment_table.txt")
+sports_table.txt_aktar("sports_table.txt")
+business_table.txt_aktar("business_table.txt")
+culture_table.txt_aktar("culture_table.txt")
+entertainment_table.txt_aktar("entertainment_table.txt")
+startups_table.txt_aktar("startups_table.txt")
+cooking_table.txt_aktar("cooking_table.txt")
+world_table.txt_aktar("world_table.txt")
+space_table.txt_aktar("space_table.txt")
+nature_table.txt_aktar("nature_table.txt")
+home_decoration_table.txt_aktar("home_decoration_table.txt")
+mental_health_table.txt_aktar("mental_health_table.txt")
+productivity_table.txt_aktar("productivity_table.txt")
+social_media_table.txt_aktar("social_media_table.txt")
+parenting_table.txt_aktar("parenting_table.txt")
+career_table.txt_aktar("career_table.txt")
+virtual_reality_table.txt_aktar("virtual_reality_table.txt")
+cryptocurrency_table.txt_aktar("cryptocurrency_table.txt")
+cars_table.txt_aktar("cars_table.txt")
+anime_table.txt_aktar("anime_table.txt")
+comic_books_table.txt_aktar("comic_books_table.txt")
+camping_table.txt_aktar("camping_table.txt")
+
+graph = Graph()
+
+for i in range(kullanici_listesi.boyut):
+    kisi = kullanici_listesi.get(i).veri
+    gorsellestir(kisi, graph)
+    if i == 50:
+        break
+graph.visualize_graph()
